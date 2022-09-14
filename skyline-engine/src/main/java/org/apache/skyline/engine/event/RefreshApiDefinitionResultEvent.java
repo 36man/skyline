@@ -1,0 +1,44 @@
+/*
+ * Copyright 2013-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.skyline.engine.event;
+
+import org.springframework.context.ApplicationEvent;
+
+/**
+ * @author lijian
+ * @since time: 2022-09-07 09:50
+ */
+public class RefreshApiDefinitionResultEvent extends ApplicationEvent {
+    private static final long serialVersionUID = -4598947851116771325L;
+    private Throwable throwable;
+
+    public RefreshApiDefinitionResultEvent(Object source, Throwable throwable) {
+        super(source);
+        this.throwable = throwable;
+    }
+
+    public RefreshApiDefinitionResultEvent(Object source) {
+        super(source);
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public boolean isSuccess() {
+        return throwable == null;
+    }
+}

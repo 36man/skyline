@@ -1,0 +1,103 @@
+/*
+ * Copyright 2013-2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.skyline.engine.predicate.factory;
+
+import lombok.Getter;
+import org.apache.skyline.model.predicate.SkylinePredicate;
+import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.reactive.function.server.ServerRequest;
+
+import javax.validation.constraints.NotEmpty;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+
+/**
+ * @author lijian
+ * @since time: 2022-09-05 22:31
+ */
+public class HeaderRoutePredicateFactory extends AbstractRoutePredicateFactory<HeaderRoutePredicateFactory.Config> {
+
+    /**
+     * Header key.
+     */
+    public static final String HEADER_KEY = "header";
+
+    /**
+     * Regexp key.
+     */
+    public static final String REGEXP_KEY = "regexp";
+
+    public HeaderRoutePredicateFactory() {
+        super(Config.class);
+    }
+
+    @Override
+    public List<String> shortcutFieldOrder() {
+        return Arrays.asList(HEADER_KEY, REGEXP_KEY);
+    }
+
+    @Override
+    public Predicate<ServerRequest> apply(Config config) {
+        boolean hasRegex = !ObjectUtils.isEmpty(config.regexp);
+        return new SkylinePredicate() {
+            @Override
+            public boolean test(ServerRequest serverRequest) {
+                List<String> values = serverRequest.headers().asHttpHeaders()
+                        .getOrDefault(config.header, Collections.emptyList());
+                if (values.isEmpty()) {
+                    return false;
+                }
+                if (hasRegex) {
+                    return values.stream().anyMatch(s -> s.matches(config.regexp));
+                }
+                // there is a value and since regexp is empty, we only check existence
+                return true;
+            }
+
+            @Override
+            public Object getConfig() {
+                return config;
+            }
+
+            @Override
+            public String toString() {
+                return String.format("Header: %s regexp=%s", config.header, config.regexp);
+            }
+        };
+    }
+
+    @Validated
+    public static class Config {
+        @NotEmpty
+        @Getter
+        private String header;
+        @Getter
+        private String regexp;
+
+        public Config getHeader(String header) {
+            this.header = header;
+            return this;
+        }
+
+        public Config getRegexp(String regexp) {
+            this.regexp = regexp;
+            return this;
+        }
+    }
+}

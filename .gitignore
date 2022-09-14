@@ -1,0 +1,10 @@
+/**/.idea
+/**/*.iml
+/**/target/*
+/data
+/logs
+/**/*.so
+/**/logs/**
+/**/libs/**
+/**/.DS_Store
+/**/tmp/**

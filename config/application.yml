@@ -1,0 +1,8 @@
+
+skyline:
+  plugin-path: "plugins"
+
+
+logging:
+  level:
+    root: INFO
