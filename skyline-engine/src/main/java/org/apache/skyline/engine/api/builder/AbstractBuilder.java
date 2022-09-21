@@ -26,10 +26,11 @@ import org.apache.skyline.model.support.Buildable;
 import org.apache.skyline.plugin.PluginBootstrap;
 import org.apache.skyline.plugin.PluginDefinition;
 import org.apache.skyline.plugin.PluginManager;
+import org.apache.skyline.plugin.SkylinePluginWrapper;
 import org.apache.skyline.plugin.api.SkylinePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -147,7 +148,7 @@ public abstract class AbstractBuilder<B extends AbstractBuilder<B>> implements B
         return getThis();
     }
 
-    public abstract AsyncPredicate<ServerRequest> getPredicate();
+    public abstract AsyncPredicate<ServerWebExchange> getPredicate();
 
     public Api build(Object... params) {
         if (!(params != null && params.length == 2 && params[0]
@@ -177,20 +178,21 @@ public abstract class AbstractBuilder<B extends AbstractBuilder<B>> implements B
         }
         api.setIdentification(this.id + "_" + this.apiCluster.getId() + "_" + this.apiGroup.getId());
         api.setPredicate(getPredicate());
-        api.setPlugins(convertPlugins(this.pluginDefinitions, pluginManager, skylineProperties));
+        api.setPluginWrappers(convertPlugins(this.pluginDefinitions, pluginManager, skylineProperties));
         return api;
     }
 
-    private List<SkylinePlugin> convertPlugins(List<PluginDefinition> pluginDefinitions,
-                                               PluginManager pluginManager, SkylineProperties skylineProperties) {
+    private List<SkylinePluginWrapper<?>> convertPlugins(List<PluginDefinition> pluginDefinitions,
+                                                      PluginManager pluginManager, SkylineProperties skylineProperties) {
         return pluginDefinitions.stream().map(
                 pluginDefinition -> pluginManager.getPlugins().computeIfAbsent(pluginDefinition.getDefineClass(),
                         s -> {
                             try {
                                 LOGGER.debug("loading plugin class {}.", pluginDefinition.getDefineClass());
-                                return (SkylinePlugin) Class.forName(
+                                SkylinePlugin<?> plugin = (SkylinePlugin<?>) Class.forName(
                                         pluginDefinition.getDefineClass(), true,
                                         new SkylineClassLoader(PluginBootstrap.class.getClassLoader(), skylineProperties.getPluginPath())).getConstructor().newInstance();
+                                return new SkylinePluginWrapper<>(plugin, pluginDefinition.getConfig());
                             } catch (Throwable t) {
                                 LOGGER.error("load plugin [" + pluginDefinition.getDefineClass() + "] failure.", t);
                                 throw new SkylineException(t);

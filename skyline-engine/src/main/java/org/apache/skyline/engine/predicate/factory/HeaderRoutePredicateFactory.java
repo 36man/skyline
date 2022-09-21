@@ -19,7 +19,7 @@ import lombok.Getter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
@@ -53,12 +53,12 @@ public class HeaderRoutePredicateFactory extends AbstractRoutePredicateFactory<H
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         boolean hasRegex = !ObjectUtils.isEmpty(config.regexp);
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                List<String> values = serverRequest.headers().asHttpHeaders()
+            public boolean test(ServerWebExchange exchange) {
+                List<String> values = exchange.getRequest().getHeaders()
                         .getOrDefault(config.header, Collections.emptyList());
                 if (values.isEmpty()) {
                     return false;

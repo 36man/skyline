@@ -97,8 +97,13 @@ public class TestApiDefinitionLocator implements ApiDefinitionLocator, Initializ
 
     private List<PluginDefinition> createPluginDefinitions() {
         PluginDefinition pluginDefinition = new PluginDefinition();
-        pluginDefinition.setName("dubbo");
-        pluginDefinition.setConfig("jsonConfig");
+        pluginDefinition.setName("AddRequestHeader");
+        //language=JSON
+        String jsonConf = "{\n" +
+                "  \"name\": \"full-name\",\n" +
+                "  \"value\": \"alex\"\n" +
+                "}";
+        pluginDefinition.setConfig(jsonConf);
         pluginDefinition.setJarUrl("http://localhost:9898/testPlugin.jar");
         pluginDefinition.setJarName("testPlugin.jar");
 

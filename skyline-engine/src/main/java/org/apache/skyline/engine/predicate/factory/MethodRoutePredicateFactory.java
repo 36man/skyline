@@ -20,7 +20,7 @@ import lombok.Setter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,12 +49,12 @@ public class MethodRoutePredicateFactory extends AbstractRoutePredicateFactory<M
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
 
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                return Arrays.stream(config.methods).anyMatch(httpMethod -> httpMethod == serverRequest.method());
+            public boolean test(ServerWebExchange exchange) {
+                return Arrays.stream(config.methods).anyMatch(httpMethod -> httpMethod == exchange.getRequest().getMethod());
             }
 
             @Override

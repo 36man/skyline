@@ -31,7 +31,7 @@ import org.apache.skyline.model.predicate.AsyncPredicate;
 import org.apache.skyline.plugin.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -85,23 +85,23 @@ public class DefaultApiLocator implements ApiLocator {
         return ApiBuilderUtils.async(apiDefinition).asyncPredicate(combinePredicates(apiDefinition)).build(pluginManager, skylineProperties);
     }
 
-    private AsyncPredicate<ServerRequest> combinePredicates(ApiDefinition apiDefinition) {
+    private AsyncPredicate<ServerWebExchange> combinePredicates(ApiDefinition apiDefinition) {
         List<PredicateDefinition> predicates = apiDefinition.getPredicates();
         if (predicates == null || predicates.isEmpty()) {
             // this is a very rare case, but possible, just match all
             return AsyncPredicate.from(exchange -> true);
         }
-        AsyncPredicate<ServerRequest> predicate = lookupPredicate(apiDefinition, predicates.get(0));
+        AsyncPredicate<ServerWebExchange> predicate = lookupPredicate(apiDefinition, predicates.get(0));
 
         for (PredicateDefinition andPredicate : predicates.subList(1, predicates.size())) {
-            AsyncPredicate<ServerRequest> found = lookupPredicate(apiDefinition, andPredicate);
+            AsyncPredicate<ServerWebExchange> found = lookupPredicate(apiDefinition, andPredicate);
             predicate = predicate.and(found);
         }
 
         return predicate;
     }
 
-    private AsyncPredicate<ServerRequest> lookupPredicate(ApiDefinition apiDefinition, PredicateDefinition predicateDefinition) {
+    private AsyncPredicate<ServerWebExchange> lookupPredicate(ApiDefinition apiDefinition, PredicateDefinition predicateDefinition) {
         PredicateFactoryEnum predicateFactoryEnum = PredicateFactoryEnum.getPredicateFactoryEnum(predicateDefinition.getName());
         if (predicateFactoryEnum == null) {
             throw new SkylineException("not found predicate Factory [" + predicateDefinition.getName() + "] in enums");

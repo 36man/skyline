@@ -18,7 +18,7 @@ package org.apache.skyline.engine.api.builder;
 import org.apache.skyline.model.predicate.AsyncPredicate;
 import org.apache.skyline.model.support.ModelUtils;
 import org.springframework.util.Assert;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.function.Predicate;
 
@@ -28,7 +28,7 @@ import java.util.function.Predicate;
  */
 public class AsyncBuilder extends AbstractBuilder<AsyncBuilder> {
 
-    protected AsyncPredicate<ServerRequest> predicate;
+    protected AsyncPredicate<ServerWebExchange> predicate;
 
     @Override
     protected AsyncBuilder getThis() {
@@ -36,26 +36,26 @@ public class AsyncBuilder extends AbstractBuilder<AsyncBuilder> {
     }
 
     @Override
-    public AsyncPredicate<ServerRequest> getPredicate() {
+    public AsyncPredicate<ServerWebExchange> getPredicate() {
         return this.predicate;
     }
 
-    public AsyncBuilder predicate(Predicate<ServerRequest> predicate) {
+    public AsyncBuilder predicate(Predicate<ServerWebExchange> predicate) {
         return asyncPredicate(ModelUtils.toAsyncPredicate(predicate));
     }
 
-    public AsyncBuilder asyncPredicate(AsyncPredicate<ServerRequest> predicate) {
+    public AsyncBuilder asyncPredicate(AsyncPredicate<ServerWebExchange> predicate) {
         this.predicate = predicate;
         return this;
     }
 
-    public AsyncBuilder and(AsyncPredicate<ServerRequest> predicate) {
+    public AsyncBuilder and(AsyncPredicate<ServerWebExchange> predicate) {
         Assert.notNull(this.predicate, "can not call and() on null predicate");
         this.predicate = this.predicate.and(predicate);
         return this;
     }
 
-    public AsyncBuilder or(AsyncPredicate<ServerRequest> predicate) {
+    public AsyncBuilder or(AsyncPredicate<ServerWebExchange> predicate) {
         Assert.notNull(this.predicate, "can not call or() on null predicate");
         this.predicate = this.predicate.or(predicate);
         return this;

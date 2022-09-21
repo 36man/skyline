@@ -16,7 +16,6 @@
 package org.apache.skyline.plugin;
 
 import lombok.Getter;
-import org.apache.skyline.plugin.api.SkylinePlugin;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PluginManager {
 
     @Getter
-    private Map<String, SkylinePlugin> plugins = new ConcurrentHashMap<>();
+    private Map<String, SkylinePluginWrapper<?>> plugins = new ConcurrentHashMap<>();
 
 }

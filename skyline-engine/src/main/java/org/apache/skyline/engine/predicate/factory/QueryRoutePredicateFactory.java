@@ -19,7 +19,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
@@ -51,14 +51,15 @@ public class QueryRoutePredicateFactory extends AbstractRoutePredicateFactory<Qu
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
+            public boolean test(ServerWebExchange exchange) {
+
                 if (!StringUtils.isNotBlank(config.regexp)) {
-                    return serverRequest.queryParams().containsKey(config.param);
+                    return exchange.getRequest().getQueryParams().containsKey(config.param);
                 }
-                List<String> values = serverRequest.queryParams().get(config.param);
+                List<String> values = exchange.getRequest().getQueryParams().get(config.param);
                 if (values == null) {
                     return false;
                 }

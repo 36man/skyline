@@ -1,0 +1,2 @@
+
+AddRequestHeader=org.apache.skyline.plugin.simple.web.AddRequestHeaderPlugin

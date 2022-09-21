@@ -18,7 +18,7 @@ package org.apache.skyline.engine.api.builder;
 import org.apache.skyline.model.predicate.AsyncPredicate;
 import org.apache.skyline.model.support.ModelUtils;
 import org.springframework.util.Assert;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.function.Predicate;
 
@@ -28,7 +28,7 @@ import java.util.function.Predicate;
  */
 public class Builder extends AbstractBuilder<Builder> {
 
-    protected Predicate<ServerRequest> predicate;
+    protected Predicate<ServerWebExchange> predicate;
 
     @Override
     protected Builder getThis() {
@@ -36,17 +36,17 @@ public class Builder extends AbstractBuilder<Builder> {
     }
 
     @Override
-    public AsyncPredicate<ServerRequest> getPredicate() {
+    public AsyncPredicate<ServerWebExchange> getPredicate() {
         return ModelUtils.toAsyncPredicate(this.predicate);
     }
 
-    public Builder and(Predicate<ServerRequest> predicate) {
+    public Builder and(Predicate<ServerWebExchange> predicate) {
         Assert.notNull(this.predicate, "can not call and() on null predicate");
         this.predicate = this.predicate.and(predicate);
         return this;
     }
 
-    public Builder or(Predicate<ServerRequest> predicate) {
+    public Builder or(Predicate<ServerWebExchange> predicate) {
         Assert.notNull(this.predicate, "can not call or() on null predicate");
         this.predicate = this.predicate.or(predicate);
         return this;

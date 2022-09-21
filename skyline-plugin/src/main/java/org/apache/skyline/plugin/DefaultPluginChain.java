@@ -15,10 +15,14 @@
  */
 package org.apache.skyline.plugin;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.skyline.commons.exception.SkylineException;
+import org.apache.skyline.commons.utils.CastUtils;
+import org.apache.skyline.commons.utils.JsonUtils;
 import org.apache.skyline.plugin.api.SkylinePlugin;
 import org.apache.skyline.plugin.api.SkylinePluginChain;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -31,34 +35,49 @@ public class DefaultPluginChain implements SkylinePluginChain {
 
     private final int index;
 
-    private final List<SkylinePlugin> plugins;
+    private final List<SkylinePluginWrapper<?>> pluginWrappers;
 
-    public DefaultPluginChain(List<SkylinePlugin> plugins) {
-        this.plugins = plugins;
+    @Setter
+    @Getter
+    private Object config;
+
+    public DefaultPluginChain(List<SkylinePluginWrapper<?>> pluginWrappers) {
+        this.pluginWrappers = pluginWrappers;
         this.index = 0;
     }
 
     public DefaultPluginChain(DefaultPluginChain parent, int index) {
-        this.plugins = parent.getPlugins();
+        this.pluginWrappers = parent.getPluginWrappers();
         this.index = index;
     }
 
-    public List<SkylinePlugin> getPlugins() {
-        return plugins;
+    public List<SkylinePluginWrapper<?>> getPluginWrappers() {
+        return pluginWrappers;
     }
 
     @Override
-    public Mono<ServerResponse> handle(ServerRequest request) {
-        return Mono.defer(() -> {
-            if (this.index < plugins.size()) {
-                SkylinePlugin plugin = plugins.get(this.index);
-                DefaultPluginChain chain = new DefaultPluginChain(this, this.index + 1);
-                return plugin.handle(request, chain);
+    public Mono<Void> handle(ServerWebExchange exchange) {
+        if (this.index < pluginWrappers.size()) {
+            SkylinePluginWrapper<?> pluginWrapper = pluginWrappers.get(this.index);
+            if (pluginWrapper.getSkylinePlugin() == null) {
+                throw new SkylineException("pluginWrapper don't have skyline plugin instance");
             }
-            else {
-                return Mono.empty(); // complete
-            }
-        });
+            SkylinePlugin<?> plugin = pluginWrapper.getSkylinePlugin();
+            DefaultPluginChain chain = new DefaultPluginChain(this, this.index + 1);
+            return plugin.handle(exchange, chain);
+        } else {
+            return Mono.empty();
+        }
+    }
+
+    @Override
+    public <T> T getConfig() {
+        SkylinePluginWrapper<?> pluginWrapper = pluginWrappers.get(this.index - 1);
+        if (pluginWrapper.getSkylinePlugin() == null) {
+            throw new SkylineException("pluginWrapper don't have skyline plugin instance");
+        }
+        SkylinePlugin<?> plugin = pluginWrapper.getSkylinePlugin();
+        return CastUtils.cast(JsonUtils.toObj(pluginWrapper.getJsonConfig(), plugin.getConfigClass()));
     }
 
 }

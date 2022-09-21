@@ -16,12 +16,12 @@
 package org.apache.skyline.engine.predicate.factory;
 
 import lombok.Getter;
-import org.apache.skyline.engine.support.ServerRequestUtils;
+import org.apache.skyline.commons.utils.WebUtils;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,11 +56,11 @@ public class HostRoutePredicateFactory extends AbstractRoutePredicateFactory<Hos
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                String host = serverRequest.headers().asHttpHeaders().getFirst(HOST_KEY);
+            public boolean test(ServerWebExchange exchange) {
+                String host = exchange.getRequest().getHeaders().getFirst(HOST_KEY);
                 if (host == null) {
                     return false;
                 }
@@ -68,7 +68,7 @@ public class HostRoutePredicateFactory extends AbstractRoutePredicateFactory<Hos
                         .filter(p -> pathMatcher.match(p, host)).findFirst().orElse(null);
                 if (matchPattern != null) {
                     Map<String, String> variables = pathMatcher.extractUriTemplateVariables(matchPattern, host);
-                    ServerRequestUtils.putUriTemplateVariables(serverRequest, variables);
+                    WebUtils.putUriTemplateVariables(exchange, variables);
                     return true;
                 }
                 return false;

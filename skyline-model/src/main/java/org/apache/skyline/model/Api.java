@@ -20,9 +20,9 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.skyline.model.predicate.AsyncPredicate;
-import org.apache.skyline.plugin.api.SkylinePlugin;
+import org.apache.skyline.plugin.SkylinePluginWrapper;
 import org.springframework.core.Ordered;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,9 +58,9 @@ public class Api implements Ordered {
 
     private Date updateTime;
 
-    private AsyncPredicate<ServerRequest> predicate;
+    private AsyncPredicate<ServerWebExchange> predicate;
 
-    private List<SkylinePlugin> plugins = new ArrayList<>();
+    private List<SkylinePluginWrapper<?>> pluginWrappers = new ArrayList<>();
 
     private Map<String, Object> metadata = new HashMap<>();
 

@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.PathContainer;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPattern.PathMatchInfo;
 import org.springframework.web.util.pattern.PathPatternParser;
@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.apache.skyline.engine.support.ServerRequestUtils.GATEWAY_PREDICATE_API_IDENTITY;
-import static org.apache.skyline.engine.support.ServerRequestUtils.GATEWAY_PREDICATE_MATCHED_PATH_API_IDENTITY;
-import static org.apache.skyline.engine.support.ServerRequestUtils.GATEWAY_PREDICATE_MATCHED_PATH_ATTR;
-import static org.apache.skyline.engine.support.ServerRequestUtils.putUriTemplateVariables;
+import static org.apache.skyline.commons.constant.CommonConstant.GATEWAY_PREDICATE_API_IDENTITY;
+import static org.apache.skyline.commons.constant.CommonConstant.GATEWAY_PREDICATE_MATCHED_PATH_API_IDENTITY;
+import static org.apache.skyline.commons.constant.CommonConstant.GATEWAY_PREDICATE_MATCHED_PATH_ATTR;
+import static org.apache.skyline.commons.utils.WebUtils.putUriTemplateVariables;
 
 /**
  * @author lijian
@@ -74,7 +74,7 @@ public class PathRoutePredicateFactory extends AbstractRoutePredicateFactory<Pat
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         final ArrayList<PathPattern> pathPatterns = new ArrayList<>();
         synchronized (this.pathPatternParser) {
             pathPatternParser.setMatchOptionalTrailingSeparator(config.isMatchTrailingSlash());
@@ -85,8 +85,8 @@ public class PathRoutePredicateFactory extends AbstractRoutePredicateFactory<Pat
         }
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                PathContainer path = PathContainer.parsePath(serverRequest.uri().getRawPath());
+            public boolean test(ServerWebExchange exchange) {
+                PathContainer path = PathContainer.parsePath(exchange.getRequest().getURI().getRawPath());
                 Optional<PathPattern> matchPattern = pathPatterns.stream()
                         .filter(pathPattern -> pathPattern.matches(path)).findAny();
                 if (matchPattern.isPresent()) {
@@ -96,11 +96,11 @@ public class PathRoutePredicateFactory extends AbstractRoutePredicateFactory<Pat
                         //todo customize exception
                         throw new RuntimeException("PathPattern matchAndExtract error!");
                     }
-                    putUriTemplateVariables(serverRequest, pathMatchInfo.getUriVariables());
-                    serverRequest.attributes().put(GATEWAY_PREDICATE_MATCHED_PATH_ATTR, matchPattern.get().getPatternString());
-                    String apiIdentity = (String) serverRequest.attributes().get(GATEWAY_PREDICATE_API_IDENTITY);
+                    putUriTemplateVariables(exchange, pathMatchInfo.getUriVariables());
+                    exchange.getAttributes().put(GATEWAY_PREDICATE_MATCHED_PATH_ATTR, matchPattern.get().getPatternString());
+                    String apiIdentity = (String) exchange.getAttributes().get(GATEWAY_PREDICATE_API_IDENTITY);
                     if (apiIdentity != null) {
-                        serverRequest.attributes().put(GATEWAY_PREDICATE_MATCHED_PATH_API_IDENTITY, apiIdentity);
+                        exchange.getAttributes().put(GATEWAY_PREDICATE_MATCHED_PATH_API_IDENTITY, apiIdentity);
                     }
                     return true;
                 } else {

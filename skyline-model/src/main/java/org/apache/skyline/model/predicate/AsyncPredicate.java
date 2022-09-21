@@ -19,7 +19,7 @@ import org.apache.skyline.model.support.HasConfig;
 import org.apache.skyline.model.support.Visitor;
 import org.reactivestreams.Publisher;
 import org.springframework.util.Assert;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
@@ -51,7 +51,7 @@ public interface AsyncPredicate<T> extends Function<T, Publisher<Boolean>>, HasC
         visitor.visit(this);
     }
 
-    static AsyncPredicate<ServerRequest> from(Predicate<? super ServerRequest> predicate) {
+    static AsyncPredicate<ServerWebExchange> from(Predicate<? super ServerWebExchange> predicate) {
         return new DefaultAsyncPredicate<>(SkylinePredicate.wrapIfNeeded(predicate));
     }
 

@@ -22,10 +22,7 @@ import org.apache.skyline.engine.api.locator.CompositeApiDefinitionLocator;
 import org.apache.skyline.engine.api.locator.CompositeApiLocator;
 import org.apache.skyline.engine.api.locator.DefaultApiLocator;
 import org.apache.skyline.engine.api.locator.TestApiDefinitionLocator;
-import org.apache.skyline.engine.handler.CoreHandler;
-import org.apache.skyline.engine.handler.EmptyHandler;
-import org.apache.skyline.engine.handler.EntryHandler;
-import org.apache.skyline.engine.handler.SkylineHandler;
+import org.apache.skyline.engine.controller.EntryController;
 import org.apache.skyline.engine.predicate.factory.AfterRoutePredicateFactory;
 import org.apache.skyline.engine.predicate.factory.BeforeRoutePredicateFactory;
 import org.apache.skyline.engine.predicate.factory.BetweenRoutePredicateFactory;
@@ -61,20 +58,8 @@ import java.util.List;
 public class SkylineConfig {
 
     @Bean
-    public EntryHandler entryHandler(@Qualifier("cachingApiLocator") ApiLocator cachingApiLocator,
-                                     @Qualifier("coreHandler") SkylineHandler coreHandler,
-                                     @Qualifier("emptyHandler") SkylineHandler emptyHandler) {
-        return new EntryHandler(cachingApiLocator, coreHandler, emptyHandler);
-    }
-
-    @Bean
-    public SkylineHandler coreHandler() {
-        return new CoreHandler();
-    }
-
-    @Bean
-    public SkylineHandler emptyHandler() {
-        return new EmptyHandler();
+    public EntryController entryController(@Qualifier("cachingApiLocator") ApiLocator cachingApiLocator) {
+        return new EntryController(cachingApiLocator);
     }
 
     @Bean

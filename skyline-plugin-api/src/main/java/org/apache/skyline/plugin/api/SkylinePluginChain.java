@@ -15,8 +15,7 @@
  */
 package org.apache.skyline.plugin.api;
 
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,6 +24,7 @@ import reactor.core.publisher.Mono;
  */
 public interface SkylinePluginChain {
 
-    Mono<ServerResponse> handle(ServerRequest serverRequest);
+    Mono<Void> handle(ServerWebExchange exchange);
 
+    <T> T getConfig();
 }

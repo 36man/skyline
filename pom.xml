@@ -9,6 +9,7 @@
         <module>skyline-commons</module>
         <module>skyline-plugin</module>
         <module>skyline-plugin-api</module>
+        <module>skyline-plugin-assets</module>
     </modules>
 
     <parent>

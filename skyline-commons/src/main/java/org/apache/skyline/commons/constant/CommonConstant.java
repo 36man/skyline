@@ -21,6 +21,35 @@ package org.apache.skyline.commons.constant;
  */
 public final class CommonConstant {
 
+    /**
+     * URI template variables attribute name.
+     */
+    public static final String URI_TEMPLATE_VARIABLES_ATTRIBUTE = qualify("uriTemplateVariables");
+
+    /**
+     * Gateway predicate matched path attribute name.
+     */
+    public static final String GATEWAY_PREDICATE_MATCHED_PATH_ATTR = qualify("gatewayPredicateMatchedPathAttr");
+
+    /**
+     * Gateway predicate matched path route id attribute name.
+     */
+    public static final String GATEWAY_PREDICATE_MATCHED_PATH_API_IDENTITY = qualify(
+            "gatewayPredicateMatchedPathApiIdentity");
+
+    /**
+     * Gateway predicate api identity.
+     */
+    public static final String GATEWAY_PREDICATE_API_IDENTITY = qualify("gatewayPredicateApiIdentity");
+
+    public static final String GATEWAY_API_ATTR = qualify("gatewayApi");
+
+    public static final String SYS_PREFIX = "skyline";
+
     public static final String PLUGIN_CONF_FILE_NAME = "skyline-plugin.def";
 
+
+    private static String qualify(String attr) {
+        return CommonConstant.SYS_PREFIX + "." + attr;
+    }
 }

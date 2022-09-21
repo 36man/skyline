@@ -16,19 +16,17 @@
 package org.apache.skyline.engine.predicate.factory;
 
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.skyline.engine.support.ipresolver.XForwardedRemoteAddressResolver;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -56,7 +54,7 @@ public class XForwardedRemoteAddrRoutePredicateFactory extends AbstractRoutePred
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Applying XForwardedRemoteAddr route predicate with maxTrustedIndex of "
                     + config.getMaxTrustedIndex() + " for " + config.getSources().size() + " source(s)");
@@ -66,22 +64,18 @@ public class XForwardedRemoteAddrRoutePredicateFactory extends AbstractRoutePred
         wrappedConfig.setSources(config.getSources());
         wrappedConfig.setRemoteAddressResolver(XForwardedRemoteAddressResolver.maxTrustedIndex(config.getMaxTrustedIndex()));
         RemoteAddrRoutePredicateFactory remoteAddrRoutePredicateFactory = new RemoteAddrRoutePredicateFactory();
-        Predicate<ServerRequest> wrappedPredicate = remoteAddrRoutePredicateFactory.apply(wrappedConfig);
+        Predicate<ServerWebExchange> wrappedPredicate = remoteAddrRoutePredicateFactory.apply(wrappedConfig);
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                boolean isAllowed = wrappedPredicate.test(serverRequest);
+            public boolean test(ServerWebExchange exchange) {
+                boolean isAllowed = wrappedPredicate.test(exchange);
 
                 if (LOG.isDebugEnabled()) {
-                    Optional<InetSocketAddress> remoteAddress = serverRequest.remoteAddress();
-                    String hostAddress = StringUtils.EMPTY;
-                    if (remoteAddress.isPresent()) {
-                        hostAddress = remoteAddress.get().getAddress().getHostAddress();
-                    }
-                    LOG.debug("Request for \"" + serverRequest.uri() + "\" from client \""
-                            + hostAddress + "\" with \""
+                    ServerHttpRequest request = exchange.getRequest();
+                    LOG.debug("Request for \"" + request.getURI() + "\" from client \""
+                            + request.getRemoteAddress().getAddress().getHostAddress() + "\" with \""
                             + XForwardedRemoteAddressResolver.X_FORWARDED_FOR + "\" header value of \""
-                            + serverRequest.headers().asHttpHeaders().get(XForwardedRemoteAddressResolver.X_FORWARDED_FOR) + "\" is "
+                            + request.getHeaders().get(XForwardedRemoteAddressResolver.X_FORWARDED_FOR) + "\" is "
                             + (isAllowed ? "ALLOWED" : "NOT ALLOWED"));
                 }
 

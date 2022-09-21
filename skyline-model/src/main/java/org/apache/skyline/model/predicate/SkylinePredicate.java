@@ -7,7 +7,7 @@ package org.apache.skyline.model.predicate;
 import org.apache.skyline.model.support.HasConfig;
 import org.apache.skyline.model.support.Visitor;
 import org.springframework.util.Assert;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.function.Predicate;
 
@@ -15,19 +15,19 @@ import java.util.function.Predicate;
  * @author lijian
  * @since time: 2022-09-05 12:02
  */
-public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
+public interface SkylinePredicate extends Predicate<ServerWebExchange>, HasConfig {
     @Override
-    default Predicate<ServerRequest> and(Predicate<? super ServerRequest> other) {
+    default Predicate<ServerWebExchange> and(Predicate<? super ServerWebExchange> other) {
         return new AndGatewayPredicate(this, wrapIfNeeded(other));
     }
 
     @Override
-    default Predicate<ServerRequest> negate() {
+    default Predicate<ServerWebExchange> negate() {
         return new NegateGatewayPredicate(this);
     }
 
     @Override
-    default Predicate<ServerRequest> or(Predicate<? super ServerRequest> other) {
+    default Predicate<ServerWebExchange> or(Predicate<? super ServerWebExchange> other) {
         return new OrGatewayPredicate(this, wrapIfNeeded(other));
     }
 
@@ -35,7 +35,7 @@ public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
         visitor.visit(this);
     }
 
-    static SkylinePredicate wrapIfNeeded(Predicate<? super ServerRequest> other) {
+    static SkylinePredicate wrapIfNeeded(Predicate<? super ServerWebExchange> other) {
         SkylinePredicate right;
 
         if (other instanceof SkylinePredicate) {
@@ -49,15 +49,15 @@ public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
 
     class SkylinePredicateWrapper implements SkylinePredicate {
 
-        private final Predicate<? super ServerRequest> delegate;
+        private final Predicate<? super ServerWebExchange> delegate;
 
-        public SkylinePredicateWrapper(Predicate<? super ServerRequest> delegate) {
+        public SkylinePredicateWrapper(Predicate<? super ServerWebExchange> delegate) {
             Assert.notNull(delegate, "delegate GatewayPredicate must not be null");
             this.delegate = delegate;
         }
 
         @Override
-        public boolean test(ServerRequest exchange) {
+        public boolean test(ServerWebExchange exchange) {
             return this.delegate.test(exchange);
         }
 
@@ -86,7 +86,7 @@ public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
         }
 
         @Override
-        public boolean test(ServerRequest t) {
+        public boolean test(ServerWebExchange t) {
             return !this.predicate.test(t);
         }
 
@@ -116,7 +116,7 @@ public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
         }
 
         @Override
-        public boolean test(ServerRequest t) {
+        public boolean test(ServerWebExchange t) {
             return (this.left.test(t) && this.right.test(t));
         }
 
@@ -147,7 +147,7 @@ public interface SkylinePredicate extends Predicate<ServerRequest>, HasConfig {
         }
 
         @Override
-        public boolean test(ServerRequest t) {
+        public boolean test(ServerWebExchange t) {
             return (this.left.test(t) || this.right.test(t));
         }
 

@@ -5,11 +5,11 @@
 package org.apache.skyline.engine.predicate.factory;
 
 import org.apache.skyline.engine.support.NameUtils;
-import org.apache.skyline.engine.support.ServerRequestUtils;
+import org.apache.skyline.engine.support.ServerWebExchangeUtils;
 import org.apache.skyline.engine.support.ShortcutConfigurable;
 import org.apache.skyline.model.predicate.AsyncPredicate;
 import org.apache.skyline.model.support.Configurable;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -21,14 +21,14 @@ import java.util.function.Predicate;
 public interface RoutePredicateFactory<C> extends ShortcutConfigurable, Configurable<C> {
     String PATTERN_KEY = "pattern";
 
-    default Predicate<ServerRequest> apply(Consumer<C> consumer) {
+    default Predicate<ServerWebExchange> apply(Consumer<C> consumer) {
         C config = newConfig();
         consumer.accept(config);
         beforeApply(config);
         return apply(config);
     }
 
-    default AsyncPredicate<ServerRequest> applyAsync(Consumer<C> consumer) {
+    default AsyncPredicate<ServerWebExchange> applyAsync(Consumer<C> consumer) {
         C config = newConfig();
         consumer.accept(config);
         beforeApply(config);
@@ -43,13 +43,13 @@ public interface RoutePredicateFactory<C> extends ShortcutConfigurable, Configur
         throw new UnsupportedOperationException("newConfig() not implemented");
     }
 
-    Predicate<ServerRequest> apply(C config);
+    Predicate<ServerWebExchange> apply(C config);
 
     default void beforeApply(C config) {
     }
 
-    default AsyncPredicate<ServerRequest> applyAsync(C config) {
-        return ServerRequestUtils.toAsyncPredicate(apply(config));
+    default AsyncPredicate<ServerWebExchange> applyAsync(C config) {
+        return ServerWebExchangeUtils.toAsyncPredicate(apply(config));
     }
 
     default String name() {

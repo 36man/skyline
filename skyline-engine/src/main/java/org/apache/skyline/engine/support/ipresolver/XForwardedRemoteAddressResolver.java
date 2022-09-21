@@ -19,13 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author lijian
@@ -98,18 +97,18 @@ public class XForwardedRemoteAddressResolver implements RemoteAddressResolver {
      * @return The parsed values of the X-Forwarded-Header.
      */
     @Override
-    public Optional<InetSocketAddress> resolve(ServerRequest serverRequest) {
-        List<String> xForwardedValues = extractXForwardedValues(serverRequest);
+    public InetSocketAddress resolve(ServerWebExchange exchange) {
+        List<String> xForwardedValues = extractXForwardedValues(exchange);
         Collections.reverse(xForwardedValues);
         if (!xForwardedValues.isEmpty()) {
             int index = Math.min(xForwardedValues.size(), maxTrustedIndex) - 1;
-            return Optional.of(new InetSocketAddress(xForwardedValues.get(index), 0));
+            return new InetSocketAddress(xForwardedValues.get(index), 0);
         }
-        return defaultRemoteIpResolver.resolve(serverRequest);
+        return defaultRemoteIpResolver.resolve(exchange);
     }
 
-    private List<String> extractXForwardedValues(ServerRequest serverRequest) {
-        List<String> xForwardedValues = serverRequest.headers().asHttpHeaders().get(X_FORWARDED_FOR);
+    private List<String> extractXForwardedValues(ServerWebExchange exchange) {
+        List<String> xForwardedValues = exchange.getRequest().getHeaders().get(X_FORWARDED_FOR);
         if (xForwardedValues == null || xForwardedValues.isEmpty()) {
             return Collections.emptyList();
         }

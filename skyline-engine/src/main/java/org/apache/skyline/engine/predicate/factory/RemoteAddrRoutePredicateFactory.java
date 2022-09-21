@@ -24,7 +24,7 @@ import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.apache.skyline.engine.support.ShortcutConfigurable.ShortcutType.GATHER_LIST;
@@ -66,21 +65,28 @@ public class RemoteAddrRoutePredicateFactory extends AbstractRoutePredicateFacto
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         List<IpSubnetFilterRule> sources = convert(config.sources);
 
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                Optional<InetSocketAddress> remoteAddress = config.remoteAddressResolver.resolve(serverRequest);
-                if (remoteAddress.isPresent() && remoteAddress.get().getAddress() != null) {
-                    String hostAddress = remoteAddress.get().getAddress().getHostAddress();
-                    String host = serverRequest.uri().getHost();
+            public boolean test(ServerWebExchange exchange) {
+                InetSocketAddress remoteAddress = config.remoteAddressResolver.resolve(exchange);
+                if (remoteAddress != null && remoteAddress.getAddress() != null) {
+                    String hostAddress = remoteAddress.getAddress().getHostAddress();
+                    String host = exchange.getRequest().getURI().getHost();
+
                     if (LOG.isDebugEnabled() && !hostAddress.equals(host)) {
                         LOG.debug("Remote addresses didn't match " + hostAddress + " != " + host);
                     }
-                    return sources.stream().anyMatch(s -> s.matches(remoteAddress.get()));
+
+                    for (IpSubnetFilterRule source : sources) {
+                        if (source.matches(remoteAddress)) {
+                            return true;
+                        }
+                    }
                 }
+
                 return false;
             }
 

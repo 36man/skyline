@@ -15,10 +15,9 @@
  */
 package org.apache.skyline.engine.support.ipresolver;
 
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.net.InetSocketAddress;
-import java.util.Optional;
 
 /**
  * @author lijian
@@ -26,7 +25,7 @@ import java.util.Optional;
  */
 public interface RemoteAddressResolver {
 
-    default Optional<InetSocketAddress> resolve(ServerRequest serverRequest) {
-        return serverRequest.remoteAddress();
+    default InetSocketAddress resolve(ServerWebExchange exchange) {
+        return exchange.getRequest().getRemoteAddress();
     }
 }

@@ -19,7 +19,7 @@ import lombok.Getter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
@@ -53,13 +53,13 @@ public class BetweenRoutePredicateFactory extends AbstractRoutePredicateFactory<
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         Assert.isTrue(config.getDatetime1().isBefore(config.getDatetime2()),
                 config.getDatetime1() + " must be before " + config.getDatetime2());
 
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
+            public boolean test(ServerWebExchange exchange) {
                 ZonedDateTime now = ZonedDateTime.now();
                 return now.isAfter(config.getDatetime1()) && now.isBefore(config.getDatetime2());
             }
@@ -85,10 +85,6 @@ public class BetweenRoutePredicateFactory extends AbstractRoutePredicateFactory<
         @NotNull
         @Getter
         private ZonedDateTime datetime2;
-
-        public ZonedDateTime getDatetime1() {
-            return datetime1;
-        }
 
         public Config setDatetime1(ZonedDateTime datetime1) {
             this.datetime1 = datetime1;

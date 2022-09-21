@@ -19,7 +19,7 @@ import lombok.Getter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.http.HttpCookie;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
@@ -52,11 +52,11 @@ public class CookieRoutePredicateFactory extends AbstractRoutePredicateFactory<C
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
-                List<HttpCookie> cookies = serverRequest.cookies().get(config.name);
+            public boolean test(ServerWebExchange exchange) {
+                List<HttpCookie> cookies = exchange.getRequest().getCookies().get(config.name);
                 if (cookies == null) {
                     return false;
                 }

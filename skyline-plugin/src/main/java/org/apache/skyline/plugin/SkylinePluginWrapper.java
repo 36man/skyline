@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.skyline.engine.config;
+package org.apache.skyline.plugin;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.config.EnableWebFlux;
-import org.springframework.web.reactive.config.WebFluxConfigurer;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.apache.skyline.plugin.api.SkylinePlugin;
 
 /**
  * @author lijian
- * @version time: 2022-09-02 11:28
+ * @since time: 2022-09-19 16:52
  */
-@Configuration
-@EnableWebFlux
-public class WebConfig implements WebFluxConfigurer {
+@Data
+@AllArgsConstructor
+public class SkylinePluginWrapper<T> {
 
+    private SkylinePlugin<T> skylinePlugin;
 
+    private String jsonConfig;
 }

@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
@@ -45,10 +45,10 @@ public class AfterRoutePredicateFactory extends AbstractRoutePredicateFactory<Af
     }
 
     @Override
-    public Predicate<ServerRequest> apply(Config config) {
+    public Predicate<ServerWebExchange> apply(Config config) {
         return new SkylinePredicate() {
             @Override
-            public boolean test(ServerRequest serverRequest) {
+            public boolean test(ServerWebExchange exchange) {
                 final ZonedDateTime now = ZonedDateTime.now();
                 return now.isAfter(config.getDatetime());
             }
