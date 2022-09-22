@@ -13,44 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.skyline.plugin.simple.web;
+package org.apache.skyline.plugin.resp.header.add;
 
 import lombok.Data;
 import org.apache.skyline.commons.utils.WebUtils;
 import org.apache.skyline.plugin.api.SkylinePlugin;
 import org.apache.skyline.plugin.api.SkylinePluginChain;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author lijian
- * @since time: 2022-09-16 16:21
+ * @since time: 2022-09-20 10:17
  */
-public class AddRequestHeaderPlugin implements SkylinePlugin<AddRequestHeaderPlugin.Config> {
+public class AddResponseHeaderPlugin implements SkylinePlugin<AddResponseHeaderPlugin.Config> {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, SkylinePluginChain chain) {
         Config config = chain.getConfig();
         String value = WebUtils.expand(exchange, config.getValue());
-        ServerHttpRequest request = exchange.getRequest().mutate()
-                .headers(httpHeaders -> httpHeaders.add(config.getName(), value)).build();
+        exchange.getResponse().getHeaders().add(config.getName(), value);
 
-//        return chain.handle(exchange.mutate().request(request).build());
-        byte[] bytes = "Add Request".getBytes(StandardCharsets.UTF_8);
-        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-        return exchange.getResponse().writeWith(Flux.just(buffer));
+        return chain.handle(exchange);
     }
 
     @Override
     public Class<Config> getConfigClass() {
         return Config.class;
     }
-
 
     @Data
     public static class Config {

@@ -1,0 +1,2 @@
+
+AddResponseHeader=org.apache.skyline.plugin.resp.header.add.AddResponseHeaderPlugin

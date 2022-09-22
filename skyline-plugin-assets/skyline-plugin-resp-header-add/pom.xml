@@ -9,13 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>skyline-line-plugin-simple-web</artifactId>
+    <artifactId>skyline-plugin-resp-header-add</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.skyline</groupId>
             <artifactId>skyline-plugin-api</artifactId>
             <version>${project.parent.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.skyline</groupId>
@@ -27,11 +28,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.76</version>
         </dependency>
     </dependencies>
 
@@ -47,7 +43,6 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <outputDirectory>output</outputDirectory>
-                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
@@ -60,4 +55,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -13,34 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.skyline.plugin.simple.web;
+package org.apache.skyline.plugin.req.header.add;
 
 import lombok.Data;
 import org.apache.skyline.commons.utils.WebUtils;
 import org.apache.skyline.plugin.api.SkylinePlugin;
 import org.apache.skyline.plugin.api.SkylinePluginChain;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
  * @author lijian
- * @since time: 2022-09-20 10:17
+ * @since time: 2022-09-16 16:21
  */
-public class AddResponseHeaderPlugin implements SkylinePlugin<AddResponseHeaderPlugin.Config> {
+public class AddRequestHeaderPlugin implements SkylinePlugin<AddRequestHeaderPlugin.Config> {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, SkylinePluginChain chain) {
         Config config = chain.getConfig();
         String value = WebUtils.expand(exchange, config.getValue());
-        exchange.getResponse().getHeaders().add(config.getName(), value);
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(httpHeaders -> httpHeaders.add(config.getName(), value)).build();
 
-        return chain.handle(exchange);
+        return chain.handle(exchange.mutate().request(request).build());
     }
 
     @Override
     public Class<Config> getConfigClass() {
         return Config.class;
     }
+
 
     @Data
     public static class Config {

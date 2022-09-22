@@ -12,7 +12,8 @@
     <artifactId>skyline-plugin-assets</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>skyline-line-plugin-simple-web</module>
+        <module>skyline-plugin-req-header-add</module>
+        <module>skyline-plugin-resp-header-add</module>
     </modules>
 
 
