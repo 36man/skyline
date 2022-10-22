@@ -16,6 +16,7 @@
 package org.apache.skyline.engine.predicate.factory;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.skyline.model.predicate.SkylinePredicate;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
@@ -86,8 +87,10 @@ public class HeaderRoutePredicateFactory extends AbstractRoutePredicateFactory<H
     public static class Config {
         @NotEmpty
         @Getter
+        @Setter
         private String header;
         @Getter
+        @Setter
         private String regexp;
 
         public Config getHeader(String header) {

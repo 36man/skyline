@@ -54,7 +54,7 @@ public class EntryController {
 
     public EntryController(ApiLocator apiLocator) {
         this.apiLocator = apiLocator;
-        this.coreHandler = new coreHandler();
+        this.coreHandler = new CoreHandler();
         this.emptyHandler = new EmptyHandler();
     }
 
@@ -84,7 +84,7 @@ public class EntryController {
         }
     }
 
-    private static class coreHandler implements SkylineHandler {
+    private static class CoreHandler implements SkylineHandler {
 
         @Override
         public Mono<Void> handle(ServerWebExchange serverWebExchange) {

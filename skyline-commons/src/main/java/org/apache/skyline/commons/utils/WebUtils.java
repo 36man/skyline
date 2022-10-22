@@ -15,6 +15,11 @@
  */
 package org.apache.skyline.commons.utils;
 
+import org.apache.skyline.commons.support.HttpStatusHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.AbstractServerHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,6 +34,47 @@ import static org.apache.skyline.commons.constant.CommonConstant.URI_TEMPLATE_VA
  * @since time: 2022-09-16 16:31
  */
 public class WebUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebUtils.class);
+
+    public static boolean setResponseStatus(ServerWebExchange exchange, HttpStatus httpStatus) {
+        boolean response = exchange.getResponse().setStatusCode(httpStatus);
+        if (!response && LOG.isWarnEnabled()) {
+            LOG.warn("Unable to set status code to " + httpStatus + ". Response already committed.");
+        }
+        return response;
+    }
+
+    public static boolean setResponseStatus(ServerWebExchange exchange, HttpStatusHolder statusHolder) {
+        if (exchange.getResponse().isCommitted()) {
+            return false;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting response status to " + statusHolder);
+        }
+        if (statusHolder.getHttpStatus() != null) {
+            return setResponseStatus(exchange, statusHolder.getHttpStatus());
+        }
+        if (statusHolder.getStatus() != null && exchange.getResponse() instanceof AbstractServerHttpResponse) { // non-standard
+            ((AbstractServerHttpResponse) exchange.getResponse()).setRawStatusCode(statusHolder.getStatus());
+            return true;
+        }
+        return false;
+    }
+
+    public static HttpStatus parse(String statusString) {
+        HttpStatus httpStatus;
+
+        try {
+            int status = Integer.parseInt(statusString);
+            httpStatus = HttpStatus.resolve(status);
+        }
+        catch (NumberFormatException e) {
+            // try the enum string
+            httpStatus = HttpStatus.valueOf(statusString.toUpperCase());
+        }
+        return httpStatus;
+    }
 
     public static String expand(ServerWebExchange exchange, String template) {
         Assert.notNull(exchange, "exchange may not be null");

@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>skyline-plugin-req-header-add</artifactId>
+    <artifactId>skyline-plugin-req-param-add</artifactId>
 
     <dependencies>
         <dependency>
@@ -28,11 +28,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.76</version>
         </dependency>
     </dependencies>
 
@@ -60,4 +55,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

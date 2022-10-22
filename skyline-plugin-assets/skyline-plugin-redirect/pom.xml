@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>skyline-plugin-req-header-add</artifactId>
+    <artifactId>skyline-plugin-redirect</artifactId>
 
     <dependencies>
         <dependency>
@@ -30,9 +30,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.76</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -60,4 +60,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

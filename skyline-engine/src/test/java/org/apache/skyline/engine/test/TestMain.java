@@ -15,15 +15,8 @@
  */
 package org.apache.skyline.engine.test;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.skyline.commons.exception.SkylineException;
-import org.apache.skyline.engine.support.SkylinePackagePath;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author lijian
@@ -31,18 +24,7 @@ import java.net.URL;
  */
 public class TestMain {
 
-    public static void main(String[] args) throws Exception {
-        File pluginDir = new File(SkylinePackagePath.getPath(), "plugin");
-        if (!pluginDir.exists()) {
-            boolean mkdirs = pluginDir.mkdirs();
-            if (!mkdirs) {
-                throw new SkylineException("make plugin dir error");
-            }
-        }
-
-        try (InputStream input = new URL("http://localhost:9898/testPlugin.jar").openStream();
-             OutputStream output = new FileOutputStream(new File(pluginDir, "testPlugin.jar"))) {
-            IOUtils.copy(input, output);
-        }
+    public static void main(String[] args) {
+        System.out.println(URLEncoder.encode("s s", StandardCharsets.UTF_8));
     }
 }

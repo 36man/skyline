@@ -97,26 +97,26 @@ public class TestApiDefinitionLocator implements ApiDefinitionLocator, Initializ
 
     private List<PluginDefinition> createPluginDefinitions() {
         PluginDefinition pluginDefinition1 = new PluginDefinition();
-        pluginDefinition1.setName("AddRequestHeader");
+        pluginDefinition1.setName("Test1");
         //language=JSON
         String jsonConf = "{\n" +
                 "  \"name\": \"full-name\",\n" +
                 "  \"value\": \"alex\"\n" +
                 "}";
         pluginDefinition1.setConfig(jsonConf);
-        pluginDefinition1.setJarUrl("http://localhost:9898/testPlugin.jar");
-        pluginDefinition1.setJarName("testPlugin.jar");
+        pluginDefinition1.setJarUrl("http://localhost:9898/testPlugin1.jar");
+        pluginDefinition1.setJarName("testPlugin1.jar");
 
-        PluginDefinition pluginDefinition2 = new PluginDefinition();
-        pluginDefinition2.setName("AddResponseHeader");
-        //language=JSON
-        String jsonConf2 = "{\n" +
-                "  \"name\": \"my-header\",\n" +
-                "  \"value\": \"alex\"\n" +
-                "}";
-        pluginDefinition2.setConfig(jsonConf2);
-        pluginDefinition2.setJarUrl("http://localhost:9898/testPlugin2.jar");
-        pluginDefinition2.setJarName("testPlugin2.jar");
+//        PluginDefinition pluginDefinition2 = new PluginDefinition();
+//        pluginDefinition2.setName("AddResponseHeader");
+//        //language=JSON
+//        String jsonConf2 = "{\n" +
+//                "  \"name\": \"my-header\",\n" +
+//                "  \"value\": \"alex\"\n" +
+//                "}";
+//        pluginDefinition2.setConfig(jsonConf2);
+//        pluginDefinition2.setJarUrl("http://localhost:9898/testPlugin2.jar");
+//        pluginDefinition2.setJarName("testPlugin2.jar");
 
         // download jar to local disk
         String path = skylineProperties.getPluginPath().split(",")[0];
@@ -133,17 +133,17 @@ public class TestApiDefinitionLocator implements ApiDefinitionLocator, Initializ
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        try (InputStream input = new URL(pluginDefinition2.getJarUrl()).openStream();
-             OutputStream output = new FileOutputStream(new File(pluginDir, pluginDefinition2.getJarName()));) {
-            IOUtils.copy(input, output);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return List.of(pluginDefinition2, pluginDefinition1);
+//        try (InputStream input = new URL(pluginDefinition2.getJarUrl()).openStream();
+//             OutputStream output = new FileOutputStream(new File(pluginDir, pluginDefinition2.getJarName()));) {
+//            IOUtils.copy(input, output);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        return List.of(pluginDefinition1);
     }
 
     private List<PredicateDefinition> createPredicateDefinitions() {
-        String text = "Path=/welcome";
+        String text = "Header=X-Request-Id, \\d+";
         return List.of(new PredicateDefinition(text));
     }
 

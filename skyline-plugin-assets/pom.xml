@@ -14,6 +14,9 @@
     <modules>
         <module>skyline-plugin-req-header-add</module>
         <module>skyline-plugin-resp-header-add</module>
+        <module>skyline-plugin-req-param-add</module>
+        <module>skyline-plugin-redirect</module>
+        <module>test-plugin</module>
     </modules>
 
 
