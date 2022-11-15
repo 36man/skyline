@@ -15,27 +15,17 @@
  */
 package org.apache.skyline.plugin.api;
 
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
-
 /**
  * @author lijian
- * @since time: 2022-09-09 16:03
+ * @since 2022-11-09 17:16
  */
-public interface SkylinePlugin<T> extends PluginLifeCycle {
+public interface PluginLifeCycle {
 
-    Mono<Void> handle(ServerWebExchange exchange, SkylinePluginChain chain);
+    default void onInstall() {
 
-    Class<T> getConfigClass();
-
-    default List<CapableSwitch<?>> exportCapableSwitches() {
-        return List.of();
     }
 
-    default List<PerpetualResource> exportPerpetualObjs() {
-        return List.of();
-    }
+    default void onUninstall() {
 
+    }
 }

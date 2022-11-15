@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.apache.skyline.commons.exception.SkylineException;
 import org.apache.skyline.commons.utils.CastUtils;
 import org.apache.skyline.commons.utils.JsonUtils;
+import org.apache.skyline.plugin.api.DefaultCapableSwitchManager;
 import org.apache.skyline.plugin.api.SkylinePlugin;
 import org.apache.skyline.plugin.api.SkylinePluginChain;
 import org.springframework.web.server.ServerWebExchange;
@@ -78,6 +79,11 @@ public class DefaultPluginChain implements SkylinePluginChain {
         }
         SkylinePlugin<?> plugin = pluginWrapper.getSkylinePlugin();
         return CastUtils.cast(JsonUtils.toObj(pluginWrapper.getJsonConfig(), plugin.getConfigClass()));
+    }
+
+    @Override
+    public DefaultCapableSwitchManager getCapableSwitchManager() {
+        return new DefaultCapableSwitchManager();
     }
 
 }

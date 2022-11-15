@@ -15,27 +15,25 @@
  */
 package org.apache.skyline.plugin.api;
 
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
+import lombok.Getter;
 
 /**
  * @author lijian
- * @since time: 2022-09-09 16:03
+ * @since 2022-11-09 17:22
  */
-public interface SkylinePlugin<T> extends PluginLifeCycle {
+public class PerpetualResource {
 
-    Mono<Void> handle(ServerWebExchange exchange, SkylinePluginChain chain);
+    @Getter
+    private final String name;
+    @Getter
+    private final Object raw;
 
-    Class<T> getConfigClass();
-
-    default List<CapableSwitch<?>> exportCapableSwitches() {
-        return List.of();
+    public PerpetualResource(String name, Object raw) {
+        this.name = name;
+        this.raw = raw;
     }
 
-    default List<PerpetualResource> exportPerpetualObjs() {
-        return List.of();
+    public static PerpetualResource as(String name, Object raw) {
+        return new PerpetualResource(name, raw);
     }
-
 }

@@ -27,4 +27,6 @@ public interface SkylinePluginChain {
     Mono<Void> handle(ServerWebExchange exchange);
 
     <T> T getConfig();
+
+    DefaultCapableSwitchManager getCapableSwitchManager();
 }

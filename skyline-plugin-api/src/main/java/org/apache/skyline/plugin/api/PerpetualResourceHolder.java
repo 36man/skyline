@@ -15,27 +15,26 @@
  */
 package org.apache.skyline.plugin.api;
 
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author lijian
- * @since time: 2022-09-09 16:03
+ * @since 2022-11-11 14:05
  */
-public interface SkylinePlugin<T> extends PluginLifeCycle {
+public class PerpetualResourceHolder {
 
-    Mono<Void> handle(ServerWebExchange exchange, SkylinePluginChain chain);
+    private final static ConcurrentHashMap<String, PerpetualResource> perpetualResourceMap = new ConcurrentHashMap<>();
 
-    Class<T> getConfigClass();
-
-    default List<CapableSwitch<?>> exportCapableSwitches() {
-        return List.of();
+    public static void put(String resourceName, PerpetualResource perpetualResource) {
+        perpetualResourceMap.put(resourceName, perpetualResource);
     }
 
-    default List<PerpetualResource> exportPerpetualObjs() {
-        return List.of();
+    public static <T> T getResource(String resourceName) {
+        PerpetualResource perpetualResource = perpetualResourceMap.get(resourceName);
+        if (perpetualResource != null) {
+            return (T) perpetualResource.getRaw();
+        }
+        return null;
     }
 
 }
